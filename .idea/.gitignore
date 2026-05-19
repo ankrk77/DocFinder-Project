@@ -1,0 +1,23 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Ignored default folder with query files
+/queries/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Env files (Security)
+.env
+.env.local
+
+# Spring Boot sensitive files (Security)
+application.properties
+
+# Heavy auto-generated folders (Storage save karne ke liye)
+node_modules/
+target/
+__pycache__/
+.next/
