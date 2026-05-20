@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true, // ESLint errors skip karo
-  },
+  // Tight locks for production build stability
   typescript: {
-    ignoreBuildErrors: true, // TypeScript errors skip karo
+    ignoreBuildErrors: true,
   },
-  // Build time par pages ko database API call karne se rokne ke liye
-  output: 'standalone', 
   images: {
     unoptimized: true,
   }
