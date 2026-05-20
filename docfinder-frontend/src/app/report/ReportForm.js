@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,7 +9,7 @@ export default function ReportForm() {
   const router = useRouter();
   
   // States
-  const [role, setRole] = useState("founder"); // founder ya reporter
+  const [role, setRole] = useState("founder");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -22,7 +20,9 @@ export default function ReportForm() {
     certNo: "",
   });
 
-  // URL se Role uthana
+  // Base API URL configuration
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
   useEffect(() => {
     const urlRole = searchParams.get("role");
     if (urlRole === "reporter" || urlRole === "founder") {
@@ -30,12 +30,10 @@ export default function ReportForm() {
     }
   }, [searchParams]);
 
-  // File Handle karna
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  // STEP 1: AI Data Extraction
   const handleExtractData = async (e) => {
     e.preventDefault();
     if (!file) {
@@ -48,7 +46,7 @@ export default function ReportForm() {
     data.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8080/api/documents/extract", {
+      const response = await fetch(`${API_BASE_URL}/api/documents/extract`, {
         method: "POST",
         body: data,
       });
@@ -74,11 +72,10 @@ export default function ReportForm() {
       console.error("Extraction Error:", error);
       alert("Network error. Please fill the form manually.");
     } finally {
-      setLoading(false); // ✅ THE FIX: loading(false) ko theek kar diya!
+      setLoading(false);
     }
   };
 
-  // ✅ FIXED STEP 2: Real Identity Transmission to Backend
   const handleSubmitToDB = async (e) => {
     e.preventDefault();
     
@@ -94,17 +91,13 @@ export default function ReportForm() {
 
     setSubmitting(true);
 
-    // Get real user identity from local storage
     const storedUser = JSON.parse(localStorage.getItem("docfinder_user") || "{}");
     const userId = storedUser.id || "1"; 
     
     const finalData = new FormData();
     finalData.append("userId", userId); 
-    
-    // 🔥 THE FIX: explicitly sending real NAME and PHONE to avoid random generated data.
     finalData.append("userName", storedUser.name || "Unknown Citizen");
     finalData.append("userPhone", storedUser.phone || storedUser.phoneNumber || "0000000000");
-    
     finalData.append("status", role === "founder" ? "FOUND" : "LOST");
     
     const cleanId = formData.documentId.replace(/\s+/g, "").toUpperCase();
@@ -119,7 +112,7 @@ export default function ReportForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/documents/report", {
+      const response = await fetch(`${API_BASE_URL}/api/documents/report`, {
         method: "POST",
         body: finalData,
       });
@@ -248,7 +241,6 @@ export default function ReportForm() {
           </div>
         </div>
 
-        {/* ✅ FIXED & CLEANED OPERATING protocol BOARD PANEL */}
         <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg border border-slate-200 p-6 md:p-8">
           {role === "founder" ? (
             <div>
